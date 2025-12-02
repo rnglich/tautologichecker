@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tautologi Checker</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- ANIMATED BACKGROUND --- */
+    body {
+        background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #4b134f, #c94b4b);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        
+        color: white;
+        font-family: 'Poppins', sans-serif;
+        padding: 25px;
+        text-align: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Scrollbar Tipis & Rapi */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    h1 { 
+        font-size: 32px; margin-bottom: 5px; font-weight: 700; 
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    p.subtitle { color: #d1d5db; margin-bottom: 25px; font-size: 15px; letter-spacing: 0.5px; }
+
+    /* --- GLASSMORPHISM CONTAINER --- */
+    .container {
+        background: rgba(22, 27, 34, 0.75);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        
+        padding: 30px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    /* Tombol Kamus */
+    .kamus-btn {
+        background: rgba(88, 166, 255, 0.15);
+        border: 1px solid #58a6ff;
+        color: #58a6ff;
+        padding: 10px 25px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        transition: 0.3s;
+    }
+    .kamus-btn:hover { 
+        background: #58a6ff; 
+        color: #fff; 
+        box-shadow: 0 0 15px #58a6ff;
+    }
+
+    /* Dropdown */
+    select {
+        width: 100%;
+        padding: 15px;
+        background: rgba(13, 17, 23, 0.8);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 12px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+    }
+    optgroup { background: #21262d; color: #58a6ff; font-weight: bold; }
+    option { color: white; background: #0d1117; padding: 5px; }
+
+    /* Tombol Logika */
+    .btn-group { margin-bottom: 15px; }
+    .logic-btn{
+        padding: 10px 16px;
+        margin: 5px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-weight: 500;
+    }
+    .logic-btn:hover{
+        background: #58a6ff;
+        border-color: #58a6ff;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(88, 166, 255, 0.4);
+    }
+
+    /* Input */
+    input{
+        width: 90%;
+        padding: 15px;
+        font-size: 20px;
+        margin-top: 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(0,0,0,0.3);
+        color: white;
+        text-align: center;
+        font-family: monospace;
+        letter-spacing: 2px;
+    }
+    input:focus { outline: 2px solid #58a6ff; border-color: transparent; }
+
+    /* Tombol Generate */
+    .generate-btn{
+        width: 100%;
+        padding: 16px;
+        margin-top: 25px;
+        font-size: 18px;
+        background: linear-gradient(45deg, #ff512f, #dd2476);
+        border: none;
+        color: white;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-weight: 700;
+        letter-spacing: 1px;
+        box-shadow: 0 5px 20px rgba(221, 36, 118, 0.4);
+    }
+    .generate-btn:hover{ transform: scale(1.02); box-shadow: 0 8px 25px rgba(221, 36, 118, 0.6); }
+
+    /* Tabel Hasil */
+    table{
+        border-collapse: collapse;
+        margin: 30px auto;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 15px;
+        overflow: hidden;
+        width: 100%;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    th{
+        padding: 15px;
+        background: rgba(33, 38, 45, 0.9);
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+        font-size: 17px;
+        color: #58a6ff;
+    }
+    td{
+        padding: 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 17px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .B{ background: rgba(46, 160, 67, 0.3); color: #7ee787; }
+    .S{ background: rgba(218, 54, 51, 0.3); color: #ff7b72; }
+
+    /* HASIL ANALISIS BOX */
+    #result-box {
+        margin-top: 25px;
+        padding: 20px;
+        border-radius: 12px;
+        display: none; 
+        text-align: left;
+        animation: fadeIn 0.6s;
+        border: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    .res-header { font-size: 20px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    .res-quote { 
+        background: rgba(255,255,255,0.1); 
+        padding: 15px; 
+        border-radius: 8px; 
+        font-style: italic; 
+        border-left: 4px solid #fff;
+        margin-bottom: 10px;
+    }
+    .res-desc { font-size: 15px; opacity: 0.9; }
+
+    .status-tautologi { background: linear-gradient(90deg, rgba(35,134,54,0.4), rgba(35,134,54,0.1)); border-left: 5px solid #2ea043; }
+    .status-kontradiksi { background: linear-gradient(90deg, rgba(218,54,51,0.4), rgba(218,54,51,0.1)); border-left: 5px solid #ff7b72; }
+    .status-kontingensi { background: linear-gradient(90deg, rgba(31,111,235,0.4), rgba(31,111,235,0.1)); border-left: 5px solid #58a6ff; }
+
+    /* --- MODAL (POPUP KAMUS FIXED) --- */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 1000; 
+        left: 0;
+        top: 0;
+        width: 100%; 
+        height: 100%; 
+        background-color: rgba(0,0,0,0.85); 
+        backdrop-filter: blur(8px);
+        overflow-y: auto; /* Scroll layar */
+    }
+    .modal-content {
+        background: #1e1e2f;
+        margin: 50px auto; 
+        padding: 30px;
+        border: 1px solid #444;
+        width: 90%;
+        max-width: 600px;
+        border-radius: 20px;
+        box-shadow: 0 0 50px rgba(88, 166, 255, 0.2);
+        text-align: left;
+        position: relative;
+        animation: slideDown 0.4s;
+    }
+    @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 0; opacity: 1; } }
+
+    .close-btn {
+        color: #fff;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .close-btn:hover { color: #ff7b72; transform: rotate(90deg); }
+
+    .kamus-title { 
+        font-size: 24px; font-weight: bold; color: #fff; 
+        margin-bottom: 25px; border-bottom: 2px solid #30363d; padding-bottom: 10px; 
+    }
+    .kamus-item { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .kamus-term { font-weight: bold; color: #58a6ff; display: block; font-size: 17px; margin-bottom: 5px; }
+    .kamus-def { color: #c9d1d9; font-size: 15px; line-height: 1.6; }
+    .kamus-rumus { 
+        display: inline-block; background: rgba(88, 166, 255, 0.2); 
+        padding: 2px 8px; border-radius: 6px; color: #fff; font-family: monospace; font-size: 14px; margin-right: 5px;
+    }
+
+</style>
+</head>
+<body>
+
+<h1>Tautologi Checker</h1>
+<p class="subtitle">Sebuah website sederhana untuk memeriksa rumus tautologi</p>
+
+<div class="container">
+    
+    <!-- Tombol Buka Kamus -->
+    <button class="kamus-btn" onclick="openModal()"> Buka Kamus & Definisi</button>
+
+    <label style="display:block; text-align:left; margin-bottom:8px; font-weight:bold; color:#e0e0e0;">Pilih Rumus Logika:</label>
+    <select id="presetSelect" onchange="usePreset()">
+        <option value="">-- Ketik Manual atau Pilih Disini --</option>
+
+        <!-- TAUTOLOGI -->
+        <optgroup label="──────── TAUTOLOGI ────────">
+            <option value="p ∨ ¬p">p ∨ ¬p (Hukum Tertentu)</option>
+            <option value="p ∨ ¬(p ∧ q)">p ∨ ¬(p ∧ q)</option>
+        </optgroup>
+
+        <!-- KONTRADIKSI -->
+        <optgroup label="──────── KONTRADIKSI ────────">
+            <option value="p ∧ ¬p">p ∧ ¬p (Mustahil)</option>
+            <option value="(p ∧ q) ∧ ¬(p ∨ q)">(p ∧ q) ∧ ¬(p ∨ q)</option>
+        </optgroup>
+
+        <!-- IMPLIKASI TAUTOLOGI -->
+        <optgroup label="──────── IMPLIKASI TAUTOLOGI ────────">
+            <option value="(p → q) ↔ (¬p ∨ q)">(p → q) ↔ (¬p ∨ q) (Definisi)</option>
+            <option value="(p ∧ q) → (p → q)">(p ∧ q) → (p → q)</option>
+        </optgroup>
+
+        <!-- CONTINGENSI -->
+        <optgroup label="──────── CONTINGENSI ────────">
+            <option value="((p ∧ q) → r) → p">[(p ∧ q) → r] → p</option>
+        </optgroup>
+
+        <!-- OPERASI DASAR -->
+        <optgroup label="──────── OPERASI DASAR ────────">
+            <option value="p ∧ q">Konjungsi: p ∧ q</option>
+            <option value="p ∨ q">Disjungsi: p ∨ q</option>
+            <option value="¬p">Negasi: ¬p</option>
+            <option value="p → q">Implikasi: p → q</option>
+            <option value="p ↔ q">Biimplikasi: p ↔ q</option>
+        </optgroup>
+
+        <!-- VARIAN IMPLIKASI -->
+        <optgroup label="──────── VARIAN IMPLIKASI ────────">
+            <option value="q → p">Konvers: q → p</option>
+            <option value="¬p → ¬q">Invers: ¬p → ¬q</option>
+            <option value="¬q → ¬p">Kontraposisi: ¬q → ¬p</option>
+            <option value="p ∧ ¬q">Negasi Implikasi Dasar</option>
+        </optgroup>
+
+        <!-- NEGASI KHUSUS -->
+        <optgroup label="──────── NEGASI KHUSUS (SLIDE) ────────">
+            <option value="¬(p → q)">Negasi Implikasi: ¬(p → q)</option>
+            <option value="¬(q → p)">Negasi Konvers: ¬(q → p)</option>
+            <option value="¬(¬p → ¬q)">Negasi Invers: ¬(¬p → ¬q)</option>
+            <option value="¬(¬q → ¬p)">Negasi Kontraposisi: ¬(¬q → ¬p)</option>
+        </optgroup>
+    </select>
+
+    <div class="btn-group">
+        <button class="logic-btn" onclick="add('p')">p</button>
+        <button class="logic-btn" onclick="add('q')">q</button>
+        <button class="logic-btn" onclick="add('r')">r</button>
+        <button class="logic-btn" onclick="add('¬')">¬</button>
+        <button class="logic-btn" onclick="add('∧')">∧</button>
+        <button class="logic-btn" onclick="add('∨')">∨</button>
+        <button class="logic-btn" onclick="add('⊕')">⊕</button>
+        <button class="logic-btn" onclick="add('→')">→</button>
+        <button class="logic-btn" onclick="add('↔')">↔</button>
+        <button class="logic-btn" onclick="add('(')">(</button>
+        <button class="logic-btn" onclick="add(')')">)</button>
+    </div>
+
+    <input id="expr" placeholder="Rumus akan muncul di sini..." oninput="generate()">
+   
+
+    <!-- KOTAK HASIL -->
+    <div id="result-box">
+        <div id="res-header" class="res-header"></div>
+        <div id="res-quote" class="res-quote"></div>
+        <div id="res-desc" class="res-desc"></div>
+    </div>
+
+    <div id="table"></div>
+</div>
+
+<!-- POPUP KAMUS (MODAL) -->
+<div id="kamusModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <div class="kamus-title">Kamus Logika Matematika</div>
+
+    <div class="kamus-item">
+        <span class="kamus-term">1. Tautologi</span>
+        <div class="kamus-def">Pernyataan majemuk yang <b>selalu BENAR</b> dalam segala kemungkinan nilai kebenarannya. <br>Contoh: <span class="kamus-rumus">p ∨ ¬p</span> (Hujan atau tidak hujan).</div>
+    </div>
+
+    <div class="kamus-item">
+        <span class="kamus-term">2. Kontradiksi</span>
+        <div class="kamus-def">Pernyataan majemuk yang <b>selalu SALAH</b> dalam segala kemungkinan (Mustahil terjadi). <br>Contoh: <span class="kamus-rumus">p ∧ ¬p</span> (Hidup dan mati bersamaan).</div>
+    </div>
+
+    <div class="kamus-item">
+        <span class="kamus-term">3. Kontingensi</span>
+        <div class="kamus-def">Pernyataan majemuk yang nilai kebenarannya <b>bergantung pada situasi</b> (Bisa Benar, bisa Salah). <br>Sebagian besar kalimat logika masuk kategori ini.</div>
+    </div>
+
+    <div class="kamus-item">
+        <span class="kamus-term">4. Implikasi & Varian</span>
+        <div class="kamus-def">
+            • <b>Implikasi:</b> <span class="kamus-rumus">p → q</span> (Jika p maka q)<br>
+            • <b>Konvers:</b> <span class="kamus-rumus">q → p</span> (Tukar posisi)<br>
+            • <b>Invers:</b> <span class="kamus-rumus">¬p → ¬q</span> (Negasikan kedua sisi)<br>
+            • <b>Kontraposisi:</b> <span class="kamus-rumus">¬q → ¬p</span> (Tukar posisi & Negasikan)
+        </div>
+    </div>
+
+    <div class="kamus-item">
+        <span class="kamus-term">5. Negasi Pernyataan Majemuk</span>
+        <div class="kamus-def">
+            • <b>Negasi Implikasi:</b> <span class="kamus-rumus">¬(p → q)</span><br>
+            • <b>Negasi Konvers:</b> <span class="kamus-rumus">¬(q → p)</span><br>
+            • <b>Negasi Invers:</b> <span class="kamus-rumus">¬(¬p → ¬q)</span><br>
+            • <b>Negasi Kontraposisi:</b> <span class="kamus-rumus">¬(¬q → ¬p)</span>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    // --- MODAL LOGIC (Fix: Prevent Double Scroll) ---
+    function openModal() { 
+        document.getElementById("kamusModal").style.display = "block"; 
+        document.body.style.overflow = "hidden"; // Kunci scroll belakang
+    }
+    function closeModal() { 
+        document.getElementById("kamusModal").style.display = "none"; 
+        document.body.style.overflow = "auto"; // Buka kunci scroll belakang
+    }
+    window.onclick = function(event) { 
+        if (event.target == document.getElementById("kamusModal")) closeModal(); 
+    }
+
+    // --- DATA QUOTES ---
+    const CUSTOM_QUOTES = {
+        // TAUTOLOGI
+        "p∨¬p": "Aku bakal beli boba ATAU aku nggak beli boba. Salah satu pasti terjadi.",
+        "p∨¬(p∧q)": "Aku nongkrong ATAU nggak mungkin aku nongkrong sambil ngerjain tugas bareng kamu.",
+        "(p→q)↔(¬p∨q)": "Kalau aku jemput kamu, kamu bahagia—dan itu sama artinya kamu bahagia meski aku nggak jemput.",
+        "(p∧q)→(p→q)": "Kalau kita lapar bareng, otomatis kalau aku lapar berarti kamu juga lapar.",
+
+        // KONTRADIKSI
+        "p∧¬p": "Aku tidur DAN aku nggak tidur di waktu yang sama. Mustahil banget sayang.",
+        "(p∧q)∧¬(p∨q)": "Kita online bareng tapi WA bilang offline. Aneh kan.",
+
+        // CONTINGENSI
+        "((p∧q)→r)→p": "Kalau kita sepakat pergi bareng lalu itu berarti jadi pergi, maka aku ikut. Tapi kadang iya, kadang nggak — makanya kontingensi.",
+
+        // OPERASI DASAR
+        "p∧q": "Aku datang DAN kamu datang.",
+        "p∨q": "Aku datang ATAU kamu datang.",
+        "¬p": "Tidak benar bahwa aku datang.",
+        "p→q": "Kalau aku datang maka kamu ikut.",
+        "p↔q": "Aku hadir jika dan hanya jika kamu hadir juga.",
+
+        // VARIAN IMPLIKASI
+        "q→p": "<b>Konvers:</b> Kalau kamu makan mie, aku makan mie juga.",
+        "¬p→¬q": "<b>Invers:</b> Kalau aku nggak pergi, kamu juga nggak pergi.",
+        "¬q→¬p": "<b>Kontraposisi:</b> Kalau kamu nggak marah, aku juga nggak marah dong.",
+        "p∧¬q": "Aku datang TAPI kamu nggak datang (Negasi Implikasi).",
+
+        // NEGASI KHUSUS (SLIDE)
+        "¬(p→q)": "<b>Contoh Slide:</b> Suatu bendera adalah bendera RI dan bendera tersebut TIDAK berwarna merah dan putih. (p ∧ ¬q)",
+        "¬(q→p)": "<b>Contoh Slide:</b> Terdapat bendera berwarna merah dan putih tetapi bendera tersebut BUKAN bendera RI. (q ∧ ¬p)",
+        "¬(¬p→¬q)": "<b>Contoh Slide:</b> Suatu bendera BUKAN bendera RI dan bendera tersebut berwarna merah dan putih. (¬p ∧ q)",
+        "¬(¬q→¬p)": "<b>Contoh Slide:</b> Suatu bendera TIDAK berwarna merah dan putih dan bendera tersebut adalah bendera RI. (¬q ∧ p)"
+    };
+
+    const INFO_TEXT = {
+        tautologi:   "Semua hasil bernilai BENAR.",
+        kontradiksi: "Semua hasil bernilai SALAH.",
+        kontingensi: "Hasil campuran Benar dan Salah."
+    };
+    
+    const OPERATORS = ["<->", "->", "↔", "→", "⊕", "∨", "∧"]; 
+
+    // --- ENGINE LOGIKA ---
+    function usePreset() {
+        let val = document.getElementById("presetSelect").value;
+        if(val) {
+            document.getElementById("expr").value = val;
+            generate();
+        }
+    }
+
+    function clean(expr) {
+        expr = expr.replace(/-(?![>])/g, "¬");
+        expr = expr.replace(/\bv\b/gi, "∨");
+        expr = expr.replace(/\^/g, "∧");
+        expr = expr.replace(/->/g, "→");
+        expr = expr.replace(/<->/g, "↔");
+        
+        let res = expr.replace(/\s+/g, "");
+        while (res.startsWith("(") && res.endsWith(")") && isBalanced(res.slice(1, -1))) {
+            res = res.slice(1, -1);
+        }
+        return res;
+    }
+
+    function isBalanced(str) {
+        let count = 0;
+        for (let char of str) {
+            if (char === '(') count++;
+            if (char === ')') count--;
+            if (count < 0) return false;
+        }
+        return count === 0;
+    }
+
+    function getVariables(expr) {
+        let vars = new Set();
+        let cleanExpr = expr.replace(/¬/g, ""); 
+        for (let char of cleanExpr) {
+            if (/[a-z]/i.test(char) && char !== 'v') vars.add(char);
+        }
+        return [...vars].sort();
+    }
+
+    function parseExpression(expr) {
+        expr = clean(expr);
+        for (let op of OPERATORS) {
+            let level = 0;
+            for (let i = 0; i < expr.length; i++) {
+                if (expr[i] === '(') level++;
+                else if (expr[i] === ')') level--;
+                else if (level === 0 && expr.substr(i).startsWith(op)) {
+                    if (i > 0) {
+                        return { type: "binary", op: op, left: expr.substring(0, i), right: expr.substring(i + op.length) };
+                    }
+                }
+            }
+        }
+        if (expr.startsWith("¬")) return { type: "neg", inner: expr.slice(1) };
+        return { type: "atom", value: expr };
+    }
+
+    function getAllSubExpressions(expr, set) {
+        expr = clean(expr);
+        if (!expr || set.has(expr)) return;
+        let parsed = parseExpression(expr);
+        if (parsed.type === "binary") {
+            getAllSubExpressions(parsed.left, set);
+            getAllSubExpressions(parsed.right, set);
+            set.add(expr);
+        } else if (parsed.type === "neg") {
+            getAllSubExpressions(parsed.inner, set);
+            set.add(expr);
+        }
+    }
+
+    function solve(expr, values) {
+        expr = clean(expr);
+        if (values.hasOwnProperty(expr)) return values[expr];
+        let parsed = parseExpression(expr);
+        if (parsed.type === "neg") return !solve(parsed.inner, values);
+        else if (parsed.type === "binary") {
+            let valA = solve(parsed.left, values);
+            let valB = solve(parsed.right, values);
+            switch (parsed.op) {
+                case "∧": return valA && valB;
+                case "∨": return valA || valB;
+                case "⊕": return valA !== valB;
+                case "→": case "->": return (!valA) || valB;
+                case "↔": case "<->": return valA === valB;
+            }
+        }
+        return false;
+    }
+
+    function add(symbol){
+        let inp = document.getElementById("expr");
+        inp.value += symbol;
+        inp.focus();
+        generate();
+    }
+
+    function generate(){
+        let rawInput = document.getElementById("expr").value;
+        if(!rawInput.trim()) return;
+        
+        let cleanKey = clean(rawInput);
+        let vars = getVariables(rawInput);
+        let subSet = new Set();
+        getAllSubExpressions(rawInput, subSet);
+        
+        let subs = [...subSet].sort((a, b) => {
+            if (a.length !== b.length) return a.length - b.length;
+            return a.localeCompare(b);
+        });
+
+        let columns = [...vars, ...subs];
+        let rowCount = 1 << vars.length;
+        
+        let allTrue = true;
+        let allFalse = true;
+        
+        let html = "<table><thead><tr>";
+        columns.forEach(col => html += `<th>${col}</th>`);
+        html += "</tr></thead><tbody>";
+
+        for (let i = rowCount - 1; i >= 0; i--){
+            let rowValues = {};
+            vars.forEach((v, idx) => {
+                rowValues[v] = !!(i & (1 << (vars.length - 1 - idx)));
+            });
+
+            html += "<tr>";
+            let lastVal = false; 
+            columns.forEach((col, index) => {
+                let val = solve(col, rowValues);
+                if (index === columns.length - 1) lastVal = val;
+                let text = val ? "B" : "S";
+                let cls = val ? "B" : "S";
+                html += `<td class="${cls}">${text}</td>`;
+            });
+            if (lastVal) allFalse = false;
+            else allTrue = false;
+            html += "</tr>";
+        }
+        html += "</tbody></table>";
+        document.getElementById("table").innerHTML = html;
+
+        let box = document.getElementById("result-box");
+        let header = document.getElementById("res-header");
+        let quote = document.getElementById("res-quote");
+        let desc = document.getElementById("res-desc");
+
+        box.style.display = "block";
+        box.className = "";
+        
+        let customQuote = CUSTOM_QUOTES[cleanKey];
+
+        if (allTrue) {
+            box.classList.add("status-tautologi");
+            header.innerHTML = " Hasil: TAUTOLOGI";
+            desc.innerHTML = INFO_TEXT.tautologi;
+        } else if (allFalse) {
+            box.classList.add("status-kontradiksi");
+            header.innerHTML = " Hasil: KONTRADIKSI";
+            desc.innerHTML = INFO_TEXT.kontradiksi;
+        } else {
+            box.classList.add("status-kontingensi");
+            header.innerHTML = " Hasil: KONTINGENSI";
+            desc.innerHTML = INFO_TEXT.kontingensi;
+        }
+
+        if (customQuote) {
+            quote.style.display = "block";
+            quote.innerHTML = " " + customQuote;
+        } else {
+            quote.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>
